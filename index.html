@@ -849,27 +849,23 @@ PRO TIP: [One practical Morocco travel tip relevant to this itinerary]
 Be specific with real place names (riads, restaurants, landmarks). Make it inspiring yet practical.`;
 
   try {
-    const GEMINI_KEY = 'AIzaSyA6CBhAIG2Xp88DQ2GnTm1R7B8-f3Lj-ew';
-    const MODELS = ['gemini-2.0-flash','gemini-1.5-flash','gemini-1.5-flash-latest','gemini-1.0-pro'];
-    let data, succeeded = false;
-    for (const model of MODELS) {
-      const r = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { maxOutputTokens: 1500, temperature: 0.8 } })
-        }
-      );
-      data = await r.json();
-      if (!data?.error) { succeeded = true; break; }
-    }
-    if (!succeeded) throw new Error('API error ' + data.error.code + ': ' + data.error.message);
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    if (!text) {
-      const reason = data?.candidates?.[0]?.finishReason || JSON.stringify(data).slice(0, 200);
-      throw new Error('Empty response. Details: ' + reason);
-    }
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer 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'
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1500,
+        temperature: 0.8,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    if (data?.error) throw new Error('API error: ' + data.error.message);
+    const text = data?.choices?.[0]?.message?.content || '';
+    if (!text) throw new Error('Empty response. Details: ' + JSON.stringify(data).slice(0, 200));
     renderResult(text);
   } catch(e) {
     ra.innerHTML = '<div class="error-box"><p>Something went wrong while generating your itinerary.</p><p style="margin-top:8px;font-size:12px;opacity:0.7;word-break:break-word">' + e.message + '</p></div><div style="padding:1rem 2rem 1.5rem;border-top:1px solid var(--border);background:#fafafa"><button class="btn btn-primary" onclick="showResult()">Try again</button></div>';
@@ -934,6 +930,17 @@ function renderResult(text) {
     </div>`;
 
   document.getElementById('step-result').innerHTML = html;
+
+  // Re-trigger Travelpayouts Drive to scan newly injected content
+  setTimeout(function() {
+    if (window.tp && window.tp.rescan) {
+      window.tp.rescan();
+    } else {
+      var s = document.createElement('script');
+      s.src = 'https://emrld.cc/NDcyOTI3.js?t=472927';
+      document.head.appendChild(s);
+    }
+  }, 500);
 }
 
 function printItinerary() { window.print(); }
@@ -951,6 +958,14 @@ function restartPlanner() {
 
 buildGrids();
 showStep(0);
+</script>
+<script data-noptimize="1" data-cfasync="false" data-wpfc-render="false">
+  (function () {
+      var script = document.createElement("script");
+      script.async = 1;
+      script.src = 'https://emrld.cc/NDcyOTI3.js?t=472927';
+      document.head.appendChild(script);
+  })();
 </script>
 </body>
 </html>
