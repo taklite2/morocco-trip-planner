@@ -930,17 +930,29 @@ function renderResult(text) {
     </div>`;
 
   document.getElementById('step-result').innerHTML = html;
+  document.getElementById('affiliate-stripes').style.display = 'block';
 
-  // Re-trigger Travelpayouts Drive to scan newly injected content
-  setTimeout(function() {
-    if (window.tp && window.tp.rescan) {
-      window.tp.rescan();
-    } else {
-      var s = document.createElement('script');
-      s.src = 'https://emrld.cc/NDcyOTI3.js?t=472927';
-      document.head.appendChild(s);
+  // Re-trigger Travelpayouts Drive on dynamic content
+  function triggerDrive() {
+    // Method 1: official rescan
+    if (window.tp && window.tp.rescan) { window.tp.rescan(); return; }
+    // Method 2: TravelPayouts internal scanner
+    if (window.TravelPayouts && window.TravelPayouts.scan) { window.TravelPayouts.scan(); return; }
+    // Method 3: dispatch DOM mutation event to wake up Drive
+    var el = document.getElementById('step-result');
+    if (el) {
+      var ev = new Event('DOMContentLoaded', { bubbles: true });
+      el.dispatchEvent(ev);
     }
-  }, 500);
+    // Method 4: reload the Drive script fresh so it re-scans the whole page
+    var old = document.querySelector('script[src*="emrld.cc"]');
+    if (old) old.remove();
+    var s = document.createElement('script');
+    s.src = 'https://emrld.cc/NDcyOTI3.js?t=472927&r=' + Date.now();
+    document.head.appendChild(s);
+  }
+  setTimeout(triggerDrive, 800);
+  setTimeout(triggerDrive, 2000);
 }
 
 function printItinerary() { window.print(); }
@@ -959,6 +971,160 @@ function restartPlanner() {
 buildGrids();
 showStep(0);
 </script>
+
+  <!-- ── AFFILIATE STRIPES ── -->
+  <div id="affiliate-stripes" style="display:none">
+
+  <style>
+    .stripe { padding: 2.5rem 2rem; border-top: 1px solid var(--border); }
+    .stripe:nth-child(even) { background: var(--sand); }
+    .stripe:nth-child(odd) { background: #fff; }
+    .stripe-header { text-align: center; margin-bottom: 1.75rem; }
+    .stripe-icon { font-size: 24px; margin-bottom: 0.4rem; }
+    .stripe-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 500; color: var(--text); margin-bottom: 0.3rem; }
+    .stripe-sub { font-size: 13px; color: var(--text-muted); font-weight: 300; }
+    .cards-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 660px; margin: 0 auto; }
+    .aff-card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1rem; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; transition: box-shadow 0.15s, transform 0.15s; }
+    .aff-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateY(-2px); }
+    .aff-name { font-size: 14px; font-weight: 500; color: var(--text); }
+    .aff-desc { font-size: 12px; color: var(--text-muted); font-weight: 300; line-height: 1.5; flex: 1; }
+    .aff-btn { display: inline-block; margin-top: 6px; padding: 8px 16px; background: var(--green); color: #fff; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; text-decoration: none; transition: background 0.15s; white-space: nowrap; }
+    .aff-btn:hover { background: var(--green-dark); }
+    @media (max-width: 500px) { .cards-row { grid-template-columns: 1fr; } }
+  </style>
+
+  <!-- eSIMs -->
+  <div class="stripe">
+    <div class="stripe-header">
+      <div class="stripe-icon">📱</div>
+      <div class="stripe-title">Stay Connected in Morocco</div>
+      <div class="stripe-sub">Get a Morocco eSIM before you land — no roaming fees, instant activation</div>
+    </div>
+    <div class="cards-row">
+      <div class="aff-card">
+        <div class="aff-name">Yesim</div>
+        <div class="aff-desc">Instant eSIM for 150+ countries. Easy app setup, flexible data plans for Morocco.</div>
+        <a class="aff-btn" href="https://yesim.tpk.ro/DI2I8GaE" target="_blank" rel="noopener">Get eSIM →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">Saily</div>
+        <div class="aff-desc">Affordable eSIM plans with great Morocco coverage. No contracts, cancel anytime.</div>
+        <a class="aff-btn" href="https://saily.tpk.ro/wr6vLhwy" target="_blank" rel="noopener">Get eSIM →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">Airalo</div>
+        <div class="aff-desc">World's largest eSIM store. Trusted by millions of travelers visiting Morocco.</div>
+        <a class="aff-btn" href="https://airalo.tpk.ro/WdtAIt5E" target="_blank" rel="noopener">Get eSIM →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accommodation -->
+  <div class="stripe">
+    <div class="stripe-header">
+      <div class="stripe-icon">🏨</div>
+      <div class="stripe-title">Where to Stay in Morocco</div>
+      <div class="stripe-sub">From budget riads to luxury resorts — book early for the best prices</div>
+    </div>
+    <div class="cards-row">
+      <div class="aff-card">
+        <div class="aff-name">Booking.com</div>
+        <div class="aff-desc">Largest selection of riads, hotels & apartments across all Moroccan cities.</div>
+        <a class="aff-btn" href="https://booking.tpk.ro/TPo7yE82" target="_blank" rel="noopener">Find Hotels →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">Tripadvisor</div>
+        <div class="aff-desc">Compare hotels with real traveler reviews. Find top-rated stays in Morocco.</div>
+        <a class="aff-btn" href="https://tripadvisor.tpk.ro/1xWJjZDI" target="_blank" rel="noopener">Compare Hotels →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">Agoda</div>
+        <div class="aff-desc">Great deals on Morocco hotels. Often cheaper rates with member discounts.</div>
+        <a class="aff-btn" href="https://agoda.tpk.ro/u15zvirh" target="_blank" rel="noopener">See Deals →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tours -->
+  <div class="stripe">
+    <div class="stripe-header">
+      <div class="stripe-icon">🎒</div>
+      <div class="stripe-title">Tours & Activities in Morocco</div>
+      <div class="stripe-sub">Guided experiences, desert treks, cooking classes & more — book in advance</div>
+    </div>
+    <div class="cards-row">
+      <div class="aff-card">
+        <div class="aff-name">GetYourGuide</div>
+        <div class="aff-desc">Thousands of Morocco experiences. Sahara tours, city walks, food tastings & more.</div>
+        <a class="aff-btn" href="https://getyourguide.tpk.ro/OEokX3k4" target="_blank" rel="noopener">Browse Tours →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">Viator</div>
+        <div class="aff-desc">200,000+ activities worldwide. Find unique Morocco experiences with free cancellation.</div>
+        <a class="aff-btn" href="https://viator.tpk.ro/wV1ah8Ra" target="_blank" rel="noopener">Browse Tours →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">Tripadvisor</div>
+        <div class="aff-desc">Discover top-rated Morocco experiences ranked by real traveler reviews.</div>
+        <a class="aff-btn" href="https://tripadvisor.tpk.ro/1xWJjZDI" target="_blank" rel="noopener">Browse Tours →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Insurance -->
+  <div class="stripe">
+    <div class="stripe-header">
+      <div class="stripe-icon">🛡️</div>
+      <div class="stripe-title">Protect Your Morocco Trip</div>
+      <div class="stripe-sub">Don't travel without coverage — medical, cancellation & flight protection</div>
+    </div>
+    <div class="cards-row">
+      <div class="aff-card">
+        <div class="aff-name">Insubuy</div>
+        <div class="aff-desc">Compare travel insurance plans instantly. Medical & trip cancellation coverage for Morocco.</div>
+        <a class="aff-btn" href="https://insubuy.tpk.ro/tcAWtbmO" target="_blank" rel="noopener">Get Insured →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">VisitorsCoverage</div>
+        <div class="aff-desc">Trusted travel medical insurance. Easy claims, 24/7 support during your Morocco trip.</div>
+        <a class="aff-btn" href="https://visitorscoverage.tpk.ro/mNW2rGQj" target="_blank" rel="noopener">Get Insured →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">AirHelp</div>
+        <div class="aff-desc">Flight delayed or cancelled? AirHelp recovers compensation on your behalf — no upfront cost.</div>
+        <a class="aff-btn" href="https://airhelp.tpk.ro/Mr4B8uyB" target="_blank" rel="noopener">Claim Now →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flights -->
+  <div class="stripe" style="margin-bottom: 0;">
+    <div class="stripe-header">
+      <div class="stripe-icon">✈️</div>
+      <div class="stripe-title">Flights to Morocco</div>
+      <div class="stripe-sub">Compare prices across hundreds of airlines to find the best deal</div>
+    </div>
+    <div class="cards-row">
+      <div class="aff-card">
+        <div class="aff-name">Omio</div>
+        <div class="aff-desc">Search flights, trains & buses to Morocco. One platform, all transport options.</div>
+        <a class="aff-btn" href="https://omio.tpk.ro/lWNFHv9H" target="_blank" rel="noopener">Search Flights →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">Expedia</div>
+        <div class="aff-desc">Bundle flights + hotel for extra savings. Great deals on Morocco travel packages.</div>
+        <a class="aff-btn" href="https://expedia.tpk.ro/XBrW7f6f" target="_blank" rel="noopener">Search Flights →</a>
+      </div>
+      <div class="aff-card">
+        <div class="aff-name">CheapOair</div>
+        <div class="aff-desc">Discount flights to Morocco with exclusive deals you won't find elsewhere.</div>
+        <a class="aff-btn" href="https://cheapoair.tpk.ro/SqHg8hGp" target="_blank" rel="noopener">Search Flights →</a>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- end affiliate-stripes -->
+
 <script data-noptimize="1" data-cfasync="false" data-wpfc-render="false">
   (function () {
       var script = document.createElement("script");
