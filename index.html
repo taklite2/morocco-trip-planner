@@ -858,14 +858,15 @@ Be specific with real place names (riads, restaurants, landmarks). Make it inspi
       })
     });
     const data = await res.json();
+    if (data?.error) throw new Error('API error ' + data.error.code + ': ' + data.error.message);
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    if (!text) throw new Error('Empty response');
+    if (!text) {
+      const reason = data?.candidates?.[0]?.finishReason || JSON.stringify(data).slice(0, 200);
+      throw new Error('Empty response. Details: ' + reason);
+    }
     renderResult(text);
   } catch(e) {
-    ra.innerHTML = `<div class="error-box"><p>Something went wrong while generating your itinerary.</p><p style="margin-top:8px;font-size:12px;opacity:0.7">${e.message}</p></div>
-      <div style="padding:1rem 2rem 1.5rem;border-top:1px solid var(--border);background:#fafafa">
-        <button class="btn btn-primary" onclick="showResult()">Try again</button>
-      </div>`;
+    ra.innerHTML = '<div class="error-box"><p>Something went wrong while generating your itinerary.</p><p style="margin-top:8px;font-size:12px;opacity:0.7;word-break:break-word">' + e.message + '</p></div><div style="padding:1rem 2rem 1.5rem;border-top:1px solid var(--border);background:#fafafa"><button class="btn btn-primary" onclick="showResult()">Try again</button></div>';
   }
 }
 
