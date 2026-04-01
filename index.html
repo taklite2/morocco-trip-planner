@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Morocco Trip Planner — GoingMorocco.com</title>
+<meta name="description" content="Plan your perfect Morocco itinerary in minutes. AI-powered personalized day-by-day travel plans.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #A0784A;
+    --green-dark: #7A5A32;
+    --green-deep: #573E20;
+    --green-light: #F0E6D6;
+    --green-pale: #FAF5EE;
+    --sand: #F7F3EE;
+    --sand-dark: #EDE5D8;
+    --terracotta: #C4622D;
+    --text: #1a1a18;
+    --text-muted: #6b6b60;
+    --text-light: #9e9e8e;
+    --border: rgba(0,0,0,0.1);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--sand);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 2rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(247,243,238,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+  }
+
+  .logo span { color: var(--green); }
+
+  .header-link {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
+  .header-link:hover { color: var(--green); }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 120px 2rem 60px;
+    text-align: center;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-light);
+    color: var(--green-deep);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 7vw, 68px);
+    font-weight: 500;
+    line-height: 1.08;
+    color: var(--text);
+    margin-bottom: 1rem;
+    letter-spacing: -0.01em;
+  }
+
+  h1 em {
+    font-style: italic;
+    color: var(--terracotta);
+  }
+
+  .hero p {
+    font-size: 16px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 460px;
+    margin: 0 auto 2.5rem;
+    font-weight: 300;
+  }
+
+  .scroll-hint {
+    font-size: 12px;
+    color: var(--text-light);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .scroll-hint::after {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 32px;
+    background: var(--text-light);
+    animation: pulse-line 1.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse-line {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* ── PLANNER CARD ── */
+  .planner-wrap {
+    max-width: 660px;
+    margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+  }
+
+  .planner-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+  }
+
+  /* ── PROGRESS BAR ── */
+  .prog-bar-wrap {
+    height: 3px;
+    background: var(--sand-dark);
+  }
+
+  .prog-bar {
+    height: 100%;
+    background: var(--green);
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+  }
+
+  /* ── STEP CONTENT ── */
+  .step-inner {
+    padding: 2rem 2rem 1.5rem;
+  }
+
+  .step-num {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+    line-height: 1.2;
+  }
+
+  .step-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+  }
+
+  /* ── DAYS SLIDER ── */
+  .days-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 0.5rem;
+  }
+
+  .days-big {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 500;
+    color: var(--green);
+    min-width: 90px;
+    line-height: 1;
+  }
+
+  .days-big span {
+    font-size: 18px;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    margin-left: 4px;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    height: 4px;
+    background: var(--sand-dark);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--green);
+    cursor: pointer;
+    border: 3px solid #fff;
+    box-shadow: 0 1px 6px rgba(29,158,117,0.4);
+    transition: transform 0.15s;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+  .range-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 6px;
+    padding: 0 1px;
+  }
+
+  /* ── OPTION GRID ── */
+  .opt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .opt {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    cursor: pointer;
+    background: #fff;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+
+  .opt:hover {
+    border-color: var(--green);
+    background: var(--green-pale);
+    transform: translateY(-1px);
+  }
+
+  .opt.selected {
+    border-color: var(--green);
+    background: var(--green-light);
+    box-shadow: 0 0 0 1px var(--green);
+  }
+
+  .opt-icon { font-size: 22px; margin-bottom: 6px; line-height: 1; }
+  .opt-label { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.3; }
+  .opt-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+  /* ── NAV FOOTER ── */
+  .card-footer {
+    padding: 1rem 2rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--border);
+    background: #fafafa;
+  }
+
+  .step-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .step-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--sand-dark);
+    transition: all 0.2s;
+  }
+
+  .step-dot.done { background: var(--green); }
+  .step-dot.active { background: var(--green); width: 20px; border-radius: 4px; }
+
+  .nav-btns { display: flex; gap: 10px; }
+
+  .btn {
+    padding: 10px 22px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
+
+  .btn-primary {
+    background: var(--green);
+    border: 1.5px solid var(--green);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: var(--green-dark); border-color: var(--green-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29,158,117,0.3); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+  /* ── RESULT ── */
+  .result-header {
+    background: linear-gradient(135deg, #3D2810 0%, #7A5A32 100%);
+    padding: 2rem;
+    color: #fff;
+  }
+
+  .result-tag {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .result-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 0.75rem;
+  }
+
+  .meta-pill {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-weight: 300;
+  }
+
+  .result-body {
+    padding: 1.5rem 2rem;
+  }
+
+  .intro-text {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    font-weight: 300;
+    font-style: italic;
+    border-left: 2px solid var(--green-light);
+    padding-left: 1rem;
+  }
+
+  .day-block { margin-bottom: 1.25rem; }
+
+  .day-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--green-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+  }
+
+  .day-content {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.8;
+    font-weight: 300;
+  }
+
+  .day-divider {
+    border: none;
+    border-top: 1px solid var(--sand-dark);
+    margin: 1rem 0;
+  }
+
+  .tip-box {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: var(--green-pale);
+    border: 1px solid var(--green-light);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-top: 1.5rem;
+    font-size: 13px;
+    color: var(--green-deep);
+    line-height: 1.6;
+  }
+
+  .tip-box::before {
+    content: '✦';
+    color: var(--green);
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 10px;
+    padding: 1rem 2rem 1.5rem;
+    border-top: 1px solid var(--border);
+    background: #fafafa;
+    flex-wrap: wrap;
+  }
+
+  .loading {
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+
+  .loading-icon {
+    width: 48px; height: 48px;
+    border: 2px solid var(--sand-dark);
+    border-top-color: var(--green);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 1.25rem;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .loading-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .loading-steps {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 240px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .loading-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-light);
+    opacity: 0;
+    animation: fadeUp 0.4s ease forwards;
+  }
+
+  .loading-step.active { color: var(--text-muted); }
+  .loading-step::before { content: '·'; color: var(--green); font-size: 18px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .error-box {
+    padding: 2rem;
+    text-align: center;
+    color: var(--terracotta);
+    font-size: 14px;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 2rem 1rem 3rem;
+    font-size: 12px;
+    color: var(--text-light);
+    font-weight: 300;
+  }
+
+  footer a { color: var(--green); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 540px) {
+    header { padding: 0 1.25rem; }
+    .hero { padding: 100px 1.25rem 40px; }
+    .planner-wrap { padding: 0 1rem 4rem; }
+    .step-inner { padding: 1.5rem 1.25rem 1rem; }
+    .card-footer { padding: 1rem 1.25rem; }
+    .result-body, .result-header { padding: 1.25rem; }
+    .result-actions { padding: 1rem 1.25rem; }
+    .opt-grid { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 38px; }
+  }
+
+  /* ── ENTRANCE ANIMATION ── */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-in:nth-child(1) { animation-delay: 0.05s; }
+  .fade-in:nth-child(2) { animation-delay: 0.15s; }
+  .fade-in:nth-child(3) { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="https://www.goingmorocco.com" class="logo">Going<span>Morocco</span></a>
+  <a href="https://www.goingmorocco.com" class="header-link">← Back to website</a>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge fade-in">Morocco Itinerary Planner</div>
+  <h1 class="fade-in">Plan your <em>perfect</em><br>Morocco trip</h1>
+  <p class="fade-in">Answer 5 quick questions and get a personalized day-by-day itinerary crafted just for you — free, instant, no signup needed.</p>
+</div>
+
+<!-- PLANNER -->
+<div class="planner-wrap">
+  <div class="planner-card" id="planner">
+
+    <div class="prog-bar-wrap"><div class="prog-bar" id="prog-bar"></div></div>
+
+    <!-- Step 0: Days -->
+    <div class="step-inner" id="step-0">
+      <div class="step-num">Step 1 of 5</div>
+      <div class="step-title">How long is your trip?</div>
+      <div class="step-sub">We'll fill every day with the right experiences.</div>
+      <div class="days-row">
+        <div class="days-big" id="days-display">7 <span>days</span></div>
+        <input type="range" min="3" max="14" value="7" step="1" id="days-input" oninput="onDaysChange(this.value)">
+      </div>
+      <div class="range-labels"><span>3 days</span><span>14 days</span></div>
+    </div>
+
+    <!-- Step 1: Arrival -->
+    <div class="step-inner" id="step-1" style="display:none">
+      <div class="step-num">Step 2 of 5</div>
+      <div class="step-title">Where do you fly in?</div>
+      <div class="step-sub">Your journey starts here.</div>
+      <div class="opt-grid" id="grid-1"></div>
+    </div>
+
+    <!-- Step 2: Style -->
+    <div class="step-inner" id="step-2" style="display:none">
+      <div class="step-num">Step 3 of 5</div>
+      <div class="step-title">What's your travel style?</div>
+      <div class="step-sub">Be honest — this shapes everything.</div>
+      <div class="opt-grid" id="grid-2"></div>
+    </div>
+
+    <!-- Step 3: Interests -->
+    <div class="step-inner" id="step-3" style="display:none">
+      <div class="step-num">Step 4 of 5</div>
+      <div class="step-title">What do you want to experience?</div>
+      <div class="step-sub">Pick as many as you like.</div>
+      <div class="opt-grid" id="grid-3"></div>
+    </div>
+
+    <!-- Step 4: Needs -->
+    <div class="step-inner" id="step-4" style="display:none">
+      <div class="step-num">Step 5 of 5</div>
+      <div class="step-title">Any special needs?</div>
+      <div class="step-sub">Optional — helps us personalize further.</div>
+      <div class="opt-grid" id="grid-4"></div>
+    </div>
+
+    <!-- Result -->
+    <div id="step-result" style="display:none"></div>
+
+    <!-- Footer nav -->
+    <div class="card-footer" id="card-footer">
+      <div class="step-dots" id="step-dots"></div>
+      <div class="nav-btns">
+        <button class="btn btn-ghost" id="btn-back" onclick="goBack()" style="display:none">Back</button>
+        <button class="btn btn-primary" id="btn-next" onclick="goNext()">Continue →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  Powered by <a href="https://www.goingmorocco.com">GoingMorocco.com</a> &nbsp;·&nbsp; AI-generated itineraries are suggestions — always verify local conditions before travel.
+</footer>
+
+<script>
+const STEPS = [
+  { id: 'step-0', key: null,        single: true  },
+  { id: 'step-1', key: 'arrival',   single: true  },
+  { id: 'step-2', key: 'style',     single: true  },
+  { id: 'step-3', key: 'interests', single: false },
+  { id: 'step-4', key: 'needs',     single: false },
+];
+
+const GRIDS = {
+  'grid-1': [
+    { icon: '✈️', label: 'Casablanca',  desc: 'CMN — main hub' },
+    { icon: '✈️', label: 'Marrakech',   desc: 'RAK — popular choice' },
+    { icon: '✈️', label: 'Fes',         desc: 'FEZ — historic north' },
+    { icon: '✈️', label: 'Agadir',      desc: 'AGA — beach gateway' },
+    { icon: '✈️', label: 'Tangier',     desc: 'TNG — northern tip' },
+    { icon: '✈️', label: 'Rabat',       desc: 'RBA — capital city' },
+  ],
+  'grid-2': [
+    { icon: '🏕️', label: 'Adventurer',      desc: 'Desert, hiking, thrills' },
+    { icon: '🏛️', label: 'Culture lover',   desc: 'History, medinas, art' },
+    { icon: '🍽️', label: 'Foodie',          desc: 'Markets, flavors, cooking' },
+    { icon: '🏖️', label: 'Beach relaxer',   desc: 'Coast, sun, slow days' },
+    { icon: '💼', label: 'Bleisure',        desc: 'Business + leisure mix' },
+    { icon: '👨‍👩‍👧', label: 'Family trip',    desc: 'Kid-friendly activities' },
+  ],
+  'grid-3': [
+    { icon: '🏜️', label: 'Sahara desert',   desc: 'Dunes & camel trek' },
+    { icon: '🕌', label: 'Imperial cities', desc: 'Fes, Meknes, Rabat' },
+    { icon: '🏔️', label: 'Atlas Mountains', desc: 'Trekking & villages' },
+    { icon: '🌊', label: 'Atlantic coast',  desc: 'Essaouira, Agadir' },
+    { icon: '🛍️', label: 'Souks & shopping',desc: 'Crafts & medinas' },
+    { icon: '🍵', label: 'Food & hammams',  desc: 'Tagines & wellness' },
+    { icon: '🔵', label: 'Chefchaouen',     desc: 'The blue city' },
+    { icon: '🌴', label: 'Palm oases',      desc: 'Draa & Ziz valleys' },
+  ],
+  'grid-4': [
+    { icon: '🌱', label: 'Vegetarian/vegan',  desc: '' },
+    { icon: '♿', label: 'Accessibility',      desc: '' },
+    { icon: '👶', label: 'Traveling with kids',desc: '' },
+    { icon: '💸', label: 'Budget travel',      desc: '' },
+    { icon: '💎', label: 'Luxury focus',       desc: '' },
+    { icon: '🚗', label: 'Self-driving',       desc: '' },
+    { icon: '📸', label: 'Photography',        desc: '' },
+    { icon: '🧘', label: 'Wellness & retreat', desc: '' },
+  ]
+};
+
+const state = { days: 7, arrival: null, style: null, interests: [], needs: [] };
+let currentStep = 0;
+
+function buildGrids() {
+  Object.keys(GRIDS).forEach(gid => {
+    const el = document.getElementById(gid);
+    if (!el) return;
+    GRIDS[gid].forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'opt';
+      div.innerHTML = `<div class="opt-icon">${item.icon}</div><div class="opt-label">${item.label}</div>${item.desc ? `<div class="opt-desc">${item.desc}</div>` : ''}`;
+      div.onclick = () => toggleOpt(div, gid, item.label);
+      el.appendChild(div);
+    });
+  });
+}
+
+function toggleOpt(div, gid, label) {
+  const step = STEPS[currentStep];
+  if (!step) return;
+  if (step.single) {
+    document.querySelectorAll(`#${gid} .opt`).forEach(o => o.classList.remove('selected'));
+    div.classList.add('selected');
+    state[step.key] = label;
+  } else {
+    div.classList.toggle('selected');
+    const arr = state[step.key];
+    const idx = arr.indexOf(label);
+    if (idx > -1) arr.splice(idx, 1); else arr.push(label);
+  }
+  updateNav();
+}
+
+function onDaysChange(val) {
+  state.days = parseInt(val);
+  document.getElementById('days-display').innerHTML = `${val} <span>days</span>`;
+}
+
+function updateDots() {
+  const dotsEl = document.getElementById('step-dots');
+  dotsEl.innerHTML = '';
+  STEPS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i < currentStep ? ' done' : i === currentStep ? ' active' : '');
+    dotsEl.appendChild(d);
+  });
+  const pct = (currentStep / (STEPS.length - 1)) * 100;
+  document.getElementById('prog-bar').style.width = pct + '%';
+}
+
+function updateNav() {
+  const nb = document.getElementById('btn-next');
+  const bb = document.getElementById('btn-back');
+  const step = STEPS[currentStep];
+
+  bb.style.display = currentStep > 0 ? 'block' : 'none';
+
+  const isLast = currentStep === STEPS.length - 1;
+  nb.textContent = isLast ? 'Build my itinerary ✦' : 'Continue →';
+
+  if (currentStep === 0) { nb.disabled = false; return; }
+  nb.disabled = step.single ? !state[step.key] : false;
+}
+
+function showStep(idx) {
+  STEPS.forEach((s, i) => {
+    const el = document.getElementById(s.id);
+    if (el) el.style.display = i === idx ? 'block' : 'none';
+  });
+  document.getElementById('step-result').style.display = 'none';
+  updateDots();
+  updateNav();
+}
+
+function goNext() {
+  if (currentStep < STEPS.length - 1) {
+    currentStep++;
+    showStep(currentStep);
+  } else {
+    showResult();
+  }
+}
+
+function goBack() {
+  if (currentStep > 0) {
+    currentStep--;
+    showStep(currentStep);
+  }
+}
+
+function showResult() {
+  STEPS.forEach(s => { const el = document.getElementById(s.id); if (el) el.style.display = 'none'; });
+  document.getElementById('step-result').style.display = 'block';
+  document.getElementById('card-footer').style.display = 'none';
+  document.getElementById('prog-bar').style.width = '100%';
+  document.getElementById('step-dots').innerHTML = '';
+  generateItinerary();
+}
+
+async function generateItinerary() {
+  const ra = document.getElementById('step-result');
+  const loadingMessages = [
+    'Mapping your route across Morocco…',
+    'Selecting the best riads and stops…',
+    'Crafting your day-by-day experience…',
+    'Adding local tips and hidden gems…'
+  ];
+
+  ra.innerHTML = `
+    <div class="loading">
+      <div class="loading-icon"></div>
+      <div class="loading-title">Building your itinerary</div>
+      <div class="loading-sub">This takes just a moment…</div>
+      <div class="loading-steps">
+        ${loadingMessages.map((m, i) => `<div class="loading-step" style="animation-delay:${0.3 + i * 0.7}s">${m}</div>`).join('')}
+      </div>
+    </div>`;
+
+  const prompt = `You are a Morocco travel expert for GoingMorocco.com. Create a detailed day-by-day itinerary with these preferences:
+
+- Duration: ${state.days} days
+- Arrival city: ${state.arrival}
+- Travel style: ${state.style}
+- Interests: ${state.interests.join(', ') || 'general sightseeing'}
+- Special needs: ${state.needs.join(', ') || 'none'}
+
+Format EXACTLY like this — no extra text before or after:
+
+INTRO: [2 sentences setting the tone for this specific trip]
+
+Day 1 — [Evocative title]
+[3-4 sentences. Specific places, food, and tips. Vivid and practical.]
+
+Day 2 — [Evocative title]
+[3-4 sentences.]
+
+...continue for all ${state.days} days...
+
+PRO TIP: [One practical Morocco travel tip relevant to this itinerary]
+
+Be specific with real place names (riads, restaurants, landmarks). Make it inspiring yet practical.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data?.content?.[0]?.text || '';
+    if (!text) throw new Error('Empty response');
+    renderResult(text);
+  } catch(e) {
+    ra.innerHTML = `<div class="error-box"><p>Something went wrong while generating your itinerary.</p><p style="margin-top:8px;font-size:12px;opacity:0.7">${e.message}</p></div>
+      <div style="padding:1rem 2rem 1.5rem;border-top:1px solid var(--border);background:#fafafa">
+        <button class="btn btn-primary" onclick="showResult()">Try again</button>
+      </div>`;
+  }
+}
+
+function renderResult(text) {
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+
+  let intro = '';
+  let days = [];
+  let tip = '';
+  let currentDay = null;
+  let currentContent = [];
+
+  for (const line of lines) {
+    if (line.startsWith('INTRO:')) {
+      intro = line.replace('INTRO:', '').trim();
+    } else if (line.startsWith('PRO TIP:') || line.startsWith('Pro tip:')) {
+      if (currentDay) { days.push({ label: currentDay, content: currentContent.join(' ') }); currentDay = null; currentContent = []; }
+      tip = line.replace(/^pro tip:/i, '').trim();
+    } else if (line.match(/^Day\s+\d+/i)) {
+      if (currentDay) days.push({ label: currentDay, content: currentContent.join(' ') });
+      currentDay = line;
+      currentContent = [];
+    } else if (currentDay) {
+      currentContent.push(line);
+    } else if (!intro) {
+      intro = line;
+    }
+  }
+  if (currentDay) days.push({ label: currentDay, content: currentContent.join(' ') });
+
+  const pills = [
+    `${state.days} days`,
+    state.arrival,
+    state.style,
+    ...(state.interests.slice(0, 2)),
+  ].filter(Boolean);
+
+  let html = `
+    <div class="result-header">
+      <div class="result-tag">Your personalized itinerary</div>
+      <div class="result-title">Morocco in ${state.days} Days</div>
+      <div class="result-meta">${pills.map(p => `<span class="meta-pill">${p}</span>`).join('')}</div>
+    </div>
+    <div class="result-body">
+      ${intro ? `<div class="intro-text">${intro}</div>` : ''}
+      ${days.map((d, i) => `
+        <div class="day-block">
+          <div class="day-label">${d.label}</div>
+          <div class="day-content">${d.content}</div>
+        </div>
+        ${i < days.length - 1 ? '<hr class="day-divider">' : ''}
+      `).join('')}
+      ${tip ? `<div class="tip-box">${tip}</div>` : ''}
+    </div>
+    <div class="result-actions">
+      <button class="btn btn-primary" onclick="printItinerary()">Print / Save as PDF</button>
+      <button class="btn btn-ghost" onclick="restartPlanner()">Plan another trip</button>
+      <a href="https://www.goingmorocco.com/tours" class="btn btn-ghost" style="text-decoration:none">Browse tours →</a>
+    </div>`;
+
+  document.getElementById('step-result').innerHTML = html;
+}
+
+function printItinerary() { window.print(); }
+
+function restartPlanner() {
+  state.days = 7; state.arrival = null; state.style = null; state.interests = []; state.needs = [];
+  currentStep = 0;
+  document.getElementById('days-input').value = 7;
+  document.getElementById('days-display').innerHTML = '7 <span>days</span>';
+  document.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+  document.getElementById('card-footer').style.display = 'flex';
+  document.getElementById('step-result').style.display = 'none';
+  showStep(0);
+}
+
+buildGrids();
+showStep(0);
+</script>
+</body>
+</html>
