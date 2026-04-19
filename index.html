@@ -830,8 +830,47 @@ async function generateItinerary() {
       </div>
     </div>`;
 
-  const prompt = `You are a Morocco travel expert for GoingMorocco.com. Create a detailed day-by-day itinerary with these preferences:
+  const prompt = `You are a Morocco travel expert writing realistic and accurate itineraries for GoingMorocco.com.
 
+Your goal is to generate practical, geographically logical travel plans inside Morocco using simple, clear, daily-life English. Avoid fancy or promotional language.
+
+IMPORTANT RULES:
+
+1. GEOGRAPHY & TRAVEL TIME (CRITICAL)
+- Always respect real travel distances and times between Moroccan cities.
+- Do not include travel legs longer than 5 hours unless absolutely necessary.
+- If a route is too long, add a logical intermediate stop.
+- Never place destinations in the wrong city or region.
+
+2. LOCATION ACCURACY
+- Only suggest restaurants, riads, or attractions actually located in the correct city.
+- Do not mix cities (example: do NOT place Marrakech restaurants in Rabat).
+- If unsure about a specific business, keep it generic (example: "a local restaurant in the medina").
+
+3. ITINERARY FLOW
+- Ensure smooth travel progression between cities.
+- Avoid unnecessary backtracking.
+- Group nearby attractions on the same day.
+
+4. DAILY STRUCTURE — each day must include:
+- A clear title (example: "Day 1 — Arrival in Marrakech")
+- Morning, afternoon, and evening suggestions
+- Balanced pacing (no overloaded days)
+
+5. REALISTIC EXPERIENCE
+- Cities: culture, medina, monuments, food
+- Mountains: hiking, Berber villages, scenic drives
+- Desert: camel trekking, dunes, stargazing, camps
+- Coast: beaches, seafood, surf, relaxed walks
+
+6. SELF-CHECK BEFORE OUTPUT
+Before writing the final itinerary, verify:
+- Each travel leg duration is realistic
+- Each place belongs to the correct city
+- The route makes geographic sense across Morocco
+Fix any issues before outputting.
+
+USER PREFERENCES:
 - Duration: ${state.days} days
 - Arrival city: ${state.arrival}
 - Travel style: ${state.style}
@@ -840,19 +879,21 @@ async function generateItinerary() {
 
 Format EXACTLY like this — no extra text before or after:
 
-INTRO: [2 sentences setting the tone for this specific trip]
+INTRO: [2 sentences describing the overall trip tone and flow]
 
-Day 1 — [Evocative title]
-[3-4 sentences. Specific places, food, and tips. Vivid and practical.]
+Day 1 — [Clear title]
+Morning: [activity]
+Afternoon: [activity]
+Evening: [activity or dinner suggestion]
 
-Day 2 — [Evocative title]
-[3-4 sentences.]
+Day 2 — [Clear title]
+Morning: [activity]
+Afternoon: [activity]
+Evening: [activity or dinner suggestion]
 
 ...continue for all ${state.days} days...
 
-PRO TIP: [One practical Morocco travel tip relevant to this itinerary]
-
-Be specific with real place names (riads, restaurants, landmarks). Make it inspiring yet practical.`;
+PRO TIP: [One practical Morocco travel tip relevant to this specific itinerary]` 
 
   try {
     const res = await fetch('https://morocco-proxy.waleedtaklite.workers.dev', {
