@@ -830,45 +830,67 @@ async function generateItinerary() {
       </div>
     </div>`;
 
-  const prompt = `You are a Morocco travel expert writing realistic and accurate itineraries for GoingMorocco.com.
+  const prompt = `You are a Morocco travel expert and local guide with deep knowledge of every city, road, and attraction in Morocco.
 
-Your goal is to generate practical, geographically logical travel plans inside Morocco using simple, clear, daily-life English. Avoid fancy or promotional language.
+CRITICAL MINDSET:
+- You ONLY mention places, restaurants, riads, and attractions that you are 100% certain exist and are correctly located.
+- If you are not sure whether a specific restaurant or riad exists or is still open, DO NOT mention it by name. Instead use generic descriptions like "a traditional riad in the medina" or "a rooftop restaurant near Jemaa el-Fna".
+- NEVER invent or guess place names. Accuracy is more important than specificity.
+- Think of yourself as a local guide who has personally visited every place you recommend.
 
 IMPORTANT RULES:
 
 1. GEOGRAPHY & TRAVEL TIME (CRITICAL)
-- Always respect real travel distances and times between Moroccan cities.
-- Do not include travel legs longer than 5 hours unless absolutely necessary.
-- If a route is too long, add a logical intermediate stop.
-- Never place destinations in the wrong city or region.
+- Always respect real driving distances and times between Moroccan cities.
+- Use these real reference times: Casablanca-Rabat 1h, Casablanca-Marrakech 3.5h, Marrakech-Essaouira 2.5h, Marrakech-Merzouga 8h (split required), Marrakech-Agadir 3h, Fes-Chefchaouen 3h, Fes-Casablanca 4h, Marrakech-Imlil 1.5h, Ouarzazate-Merzouga 4h.
+- Do not include travel legs longer than 5 hours unless split across two days.
+- Always add a logical intermediate stop for long routes.
 
-2. LOCATION ACCURACY
-- Only suggest restaurants, riads, or attractions actually located in the correct city.
-- Do not mix cities (example: do NOT place Marrakech restaurants in Rabat).
-- If unsure about a specific business, keep it generic (example: "a local restaurant in the medina").
+2. LOCATION ACCURACY (CRITICAL)
+- Only suggest attractions, restaurants, or riads in the correct city.
+- Do NOT mix cities. Jemaa el-Fna is in Marrakech. The tanneries are in Fes. The blue streets are in Chefchaouen.
+- If unsure about a specific business name, use a generic description instead.
 
-3. ITINERARY FLOW
-- Ensure smooth travel progression between cities.
-- Avoid unnecessary backtracking.
+3. NO HALLUCINATION RULE (CRITICAL)
+- Do not invent hotel names, restaurant names, or attraction names.
+- Do not guess opening hours or prices.
+- If a place might have closed or changed, describe it generically.
+- Stick to well-known, verifiable landmarks and experiences.
+
+4. ROUTE OPTIMIZATION (CRITICAL)
+- Never return to a previously visited region unless absolutely necessary.
+- Avoid backtracking (example: Atlas → Marrakech → Atlas again is NOT allowed).
+- Each destination should move forward logically toward the final departure city.
+- Plan the route like a loop or one-way journey, not back-and-forth.
+
+5. TRAVEL DAY LABELING
+- If a journey is longer than 4 hours, clearly label it as a "Travel Day".
+- On travel days, only suggest one light activity at the destination upon arrival.
+- Do not overload travel days with sightseeing.
+
+6. ITINERARY FLOW
+- Ensure smooth progression between cities.
 - Group nearby attractions on the same day.
+- Start easy, build up, end with a relaxed final day near departure city.
 
-4. DAILY STRUCTURE — each day must include:
+7. DAILY STRUCTURE — each day must include:
 - A clear title (example: "Day 1 — Arrival in Marrakech")
 - Morning, afternoon, and evening suggestions
-- Balanced pacing (no overloaded days)
+- Balanced pacing (no more than 3 main activities per day)
 
-5. REALISTIC EXPERIENCE
-- Cities: culture, medina, monuments, food
-- Mountains: hiking, Berber villages, scenic drives
-- Desert: camel trekking, dunes, stargazing, camps
-- Coast: beaches, seafood, surf, relaxed walks
+8. REALISTIC EXPERIENCE BY TERRAIN
+- Cities: medina walk, monuments, souks, hammam, food markets
+- Mountains: Berber village visit, valley walk, scenic drive, local lunch
+- Desert: camel trek at sunset, overnight camp, sunrise dunes, stargazing
+- Coast: beach walk, seafood lunch, harbor visit, surf lesson if relevant
 
-6. SELF-CHECK BEFORE OUTPUT
-Before writing the final itinerary, verify:
-- Each travel leg duration is realistic
-- Each place belongs to the correct city
-- The route makes geographic sense across Morocco
-Fix any issues before outputting.
+9. SELF-CHECK BEFORE OUTPUT (CRITICAL)
+Before writing your final answer:
+- Confirm each travel leg is under 5 hours or labeled as a travel day
+- Confirm every place mentioned belongs to the correct city
+- Confirm the route flows logically on a map of Morocco without backtracking
+- Remove or genericize any place name you are not 100% sure about
+Only output after this check is complete.
 
 USER PREFERENCES:
 - Duration: ${state.days} days
@@ -879,12 +901,12 @@ USER PREFERENCES:
 
 Format EXACTLY like this — no extra text before or after:
 
-INTRO: [2 sentences describing the overall trip tone and flow]
+INTRO: [2 sentences describing the overall trip flow in simple language]
 
 Day 1 — [Clear title]
-Morning: [activity]
+Morning: [activity — be specific about neighborhood or landmark but only if 100% certain]
 Afternoon: [activity]
-Evening: [activity or dinner suggestion]
+Evening: [activity or dinner suggestion — generic if unsure of specific restaurant]
 
 Day 2 — [Clear title]
 Morning: [activity]
@@ -893,7 +915,7 @@ Evening: [activity or dinner suggestion]
 
 ...continue for all ${state.days} days...
 
-PRO TIP: [One practical Morocco travel tip relevant to this specific itinerary]` 
+PRO TIP: [One honest, practical Morocco travel tip for this specific trip]` 
 
   try {
     const res = await fetch('https://morocco-proxy.waleedtaklite.workers.dev', {
@@ -901,8 +923,8 @@ PRO TIP: [One practical Morocco travel tip relevant to this specific itinerary]`
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: 1500,
-        temperature: 0.8,
+        max_tokens: 2500,
+        temperature: 0.4,
         messages: [{ role: 'user', content: prompt }]
       })
     });
